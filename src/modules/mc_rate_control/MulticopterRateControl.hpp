@@ -63,8 +63,7 @@
 class MulticopterRateControl : public ModuleBase<MulticopterRateControl>, public ModuleParams, public px4::WorkItem
 {
 public:
-	MulticopterRateControl();
-
+	MulticopterRateControl(bool vtol = false);
 	virtual ~MulticopterRateControl();
 
 	/** @see ModuleBase */
@@ -90,8 +89,6 @@ private:
 	 */
 	void		parameters_updated();
 
-	void		vehicle_status_poll();
-
 	/**
 	 * Get the landing gear state based on the manual control switch position
 	 * @return vehicle_attitude_setpoint_s::LANDING_GEAR_UP or vehicle_attitude_setpoint_s::LANDING_GEAR_DOWN
@@ -112,12 +109,11 @@ private:
 
 	uORB::SubscriptionCallbackWorkItem _vehicle_angular_velocity_sub{this, ORB_ID(vehicle_angular_velocity)};
 
+	uORB::Publication<actuator_controls_s>		_actuators_0_pub;		/**< attitude actuator controls publication */
 	uORB::PublicationMulti<rate_ctrl_status_s>	_controller_status_pub{ORB_ID(rate_ctrl_status), ORB_PRIO_DEFAULT};	/**< controller status publication */
 	uORB::Publication<landing_gear_s>		_landing_gear_pub{ORB_ID(landing_gear)};
 	uORB::Publication<vehicle_rates_setpoint_s>	_v_rates_sp_pub{ORB_ID(vehicle_rates_setpoint)};			/**< rate setpoint publication */
 
-	orb_advert_t	_actuators_0_pub{nullptr};		/**< attitude actuator controls publication */
-	orb_id_t _actuators_id{nullptr};	/**< pointer to correct actuator controls0 uORB metadata structure */
 
 	landing_gear_s 			_landing_gear{};
 	manual_control_setpoint_s	_manual_control_sp{};
